@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="74732add-bcaf-487e-925e-465a92c6f1de" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+		<http:listener-interceptors>
+			<http:cors-interceptor />
+		</http:listener-interceptors>
+	</http:listener-config>
+	<flow name="choicerouter-pocFlow" doc:id="78675682-3394-414b-bca6-f1a7d1ff1b07" >
+		<http:listener doc:name="Listener" doc:id="37d21cfb-21c9-4da6-8c2c-61be069dd9c0" config-ref="HTTP_Listener_config" path="/Choice"/>
+		<set-variable value="#[attributes.queryParams.Score as Number]" doc:name="Set Variable" doc:id="12d49732-6635-4b39-8744-268ad4d8045a" variableName="Score"/>
+		<choice doc:name="Choice" doc:id="46acb904-6c75-4846-8269-34759f841178" >
+			<when expression="#[vars.Score &gt; 90]">
+				<set-payload value='#["Grade A"]' doc:name="Set Payload" doc:id="85041f34-655b-49b9-8b26-f79a41413afd" />
+			</when>
+			<when expression="#[vars.Score &gt; 70]">
+				<set-payload value='#["Grade B"]' doc:name="Set Payload" doc:id="664cd37e-80bd-4e06-b9b4-bb1b632571ef" />
+			</when>
+			<otherwise >
+				<set-payload value='#["Fail"]' doc:name="Set Payload" doc:id="a4918b47-7924-4414-8a11-487dbd4ad43e" />
+			</otherwise>
+		</choice>
+		<logger level="INFO" doc:name="Logger" doc:id="7c682c7f-1bff-4fd6-a7e0-c351105cc632" message='#["Score: " ++ vars.Score ++ " Result: " ++ payload]'/>
+	</flow>
+</mule>
